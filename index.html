@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Contract Generator</title>
+  <style>
+    .popup { display: none; position: absolute; background-color: #cfe8ff; border: 2px solid #333; padding: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Generate a Contract/LOA/POA</h2>
+
+  <label>Select Profile:</label><br>
+  <input type="radio" name="profile" value="Client">Client
+  <input type="radio" name="profile" value="Consultant">Consultant
+  <input type="radio" name="profile" value="Contractor" checked>Contractor
+  <input type="radio" name="profile" value="Sub Contractor">Sub Contractor
+  <br><br>
+
+  <label>Generate a</label>
+  <input type="text" id="contractType" placeholder="Contract/LOA/POA">
+  using AI:
+  <br><br>
+
+  <textarea id="promptBox" rows="10" cols="80" placeholder="Describe your contract..."></textarea><br><br>
+  <button onclick="openPopup()">Modify Prompt</button>
+  <button onclick="sendToGemini()">Submit</button>
+
+  <!-- Prompt Popup -->
+  <div class="popup" id="promptPopup">
+    <strong>MODIFY PRE-GENERATED AI PROMPT</strong><br><br>
+    Would you like to generate an arbitration clause? 
+    <button onclick="addToPrompt('Include an arbitration clause.')">Yes</button>
+    <button>No</button><br>
+
+    Include non-disclosure terms? 
+    <button onclick="addToPrompt('Include non-disclosure agreement terms.')">Yes</button>
+    <button>No</button><br>
+
+    Include GDPR/data protection?
+    <button onclick="addToPrompt('Include GDPR and data protection compliance.')">Yes</button>
+    <button>No</button><br>
+
+    Include dispute resolution clauses?
+    <button onclick="addToPrompt('Include dispute resolution clauses.')">Yes</button>
+    <button>No</button><br><br>
+
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <script>
+    function openPopup() {
+      document.getElementById("promptPopup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("promptPopup").style.display = "none";
+    }
+
+    function addToPrompt(text) {
+      document.getElementById("promptBox").value += "\n" + text;
+    }
+
+    function sendToGemini() {
+      const contractType = document.getElementById("contractType").value;
+      const prompt = document.getElementById("promptBox").value;
+
+      fetch("generate.php", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractType, prompt })
+      })
+      .then(res => res.text())
+      .then(data => {
+        // alert("AI Response:\n" + data);
+        document.getElementById("promptBox").value = data;
+      })
+      .catch(err => alert("Error: " + err));
+    }
+  </script>
+</body>
+</html>
